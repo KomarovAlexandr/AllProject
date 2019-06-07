@@ -241,7 +241,8 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
+	//комментарий для гитхаба
+	
   /* USER CODE BEGIN Init */
 	uint16_t i;
 	FRESULT res; //результат выполнения
