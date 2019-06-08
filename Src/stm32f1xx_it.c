@@ -41,6 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+extern int DMA_is_Ready;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -204,6 +205,7 @@ void SysTick_Handler(void)
   */
 void DMA1_Channel3_IRQHandler(void)
 {
+	DMA_is_Ready = 1;
   /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
 	HAL_TIM_PWM_Stop_DMA(&htim3,TIM_CHANNEL_4);
   /* USER CODE END DMA1_Channel3_IRQn 0 */

@@ -27,7 +27,28 @@ Project File Date:  06/06/2019
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'AllProject'
-"AllProject\AllProject.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+../Src/main.c(143): warning:  #550-D: variable "number"  was set but never used
+  	int number = 0;
+../Src/main.c(492): warning:  #177-D: variable "x"  was declared but never referenced
+  						int x = 0;
+../Src/main.c(252): warning:  #177-D: variable "i"  was declared but never referenced
+  	uint16_t i;
+../Src/main.c(253): warning:  #177-D: variable "res"  was declared but never referenced
+  	FRESULT res; //результат выполнения
+../Src/main.c(255): warning:  #177-D: variable "fn"  was declared but never referenced
+  	char *fn;
+../Src/main.c(257): warning:  #177-D: variable "fre_clust"  was declared but never referenced
+  	DWORD fre_clust, fre_sect, tot_sect;
+../Src/main.c(257): warning:  #177-D: variable "fre_sect"  was declared but never referenced
+  	DWORD fre_clust, fre_sect, tot_sect;
+../Src/main.c(257): warning:  #177-D: variable "tot_sect"  was declared but never referenced
+  	DWORD fre_clust, fre_sect, tot_sect;
+../Src/main.c: 8 warnings, 0 errors
+linking...
+Program Size: Code=21084 RO-data=1756 RW-data=708 ZI-data=29580  
+FromELF: creating hex file...
+"AllProject\AllProject.axf" - 0 Error(s), 8 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -45,7 +66,7 @@ Package Vendor: ARM
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.1
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:05
 </pre>
 </body>
 </html>
