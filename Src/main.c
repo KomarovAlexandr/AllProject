@@ -94,7 +94,7 @@ struct menu menus[] = {                        // Задаем пункты ме
   {3, 0, 0, 3, false, "Restart",  0,   0,  0},
   {4, 1, 4, 1, false, "Files",    0,   0,  0},
   {5, 1, 0, 3, true,  "NumLED",   72, 0,  144},
-  {6, 1, 0, 3, true,  "Delay",    100,   0,  1000},
+  {6, 1, 0, 3, true,  "Delay",    30,   0,  1000},
   {7, 1, 0, 3, true,  "Cycle",    0,   0,  1}
 };
 struct Image                           
@@ -169,30 +169,34 @@ void printfiles(int NumOfFiles, int shift, int restriction){
 }
 //--------------------------------------------------
 void PrintPicture(int NumPic){
-	//FRESULT res;
 	FIL Pic;
 	int k = 0;
-	//char *names = malloc(7 * sizeof(char));
-	//memcpy(names,"FRY.bmp", 7);
-	//memcpy( (char*)name,  "FRY", (size_t) strlen(Images[NumPic].name));
-	//strcat(name, ".bmp");
-	f_open(&Pic, "test4.bmp", FA_READ);
-	//f_read(&Pic, sect, 64, &bytesread);
-	//if(f_lseek(&Pic, Images[NumPic].Offset) != FR_OK) Error_Handler();
-	//if(Pic.fptr != Images[NumPic].Offset) Error_Handler();
-	f_lseek(&Pic, Images[NumPic].Offset);
-	while(k <= menus[5].value*50){
+	int x = strlen(Images[NumPic].name) + 4 + 2;
+	char *name = (char*) malloc(x * sizeof(char));
+	strcpy( (char*)name, (char*)Images[NumPic].name);
+	strcat(name, ".bmp");
+	f_open(&Pic, name, FA_READ);
+	k = Images[NumPic].Offset+19*3;
+	if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
+	while(k <= Images[NumPic].Width*Images[NumPic].Height){
 		if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
 		delay_ms(menus[6].value);
+		
 		for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
 			ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
 		}
 		while(DMA_is_Ready != 1);
 		DMA_is_Ready = 0;
 		HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
-		k += 72*3;
-		if(f_lseek(&Pic, (Images[NumPic].Offset + k)) != FR_OK) Error_Handler();
+		k += menus[5].value*3;
+		if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 	}
+	for(int i = 0; i < menus[5].value + 10; i++){
+			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
+		}
+	while(DMA_is_Ready != 1);
+	DMA_is_Ready = 0;
+	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 }
 //--------------------------------------------------
 void reset (){
@@ -362,10 +366,24 @@ int main(void)
 		else
 		{
 			f_read(&MyFile, sect, 64, &bytesread);
-			Images[i].Width = (int)sect[18];
-			Images[i].Height = (int)sect[22];
-			Images[i].Offset = (int)sect[10] + 1024;
-			Images[i].Size = (int)sect[2];
+			//Width
+			Images[i].Width |= sect[21] << 24;	//складываем ширину
+			Images[i].Width |= sect[20] << 16;
+			Images[i].Width |= sect[19] << 8;
+			Images[i].Width |= sect[18];
+			Images[i].Height |= sect[25] << 24;	//складываем высоту
+			Images[i].Height |= sect[24] << 16;
+			Images[i].Height |= sect[23] << 8;
+			Images[i].Height |= sect[22];
+			Images[i].Offset |= sect[13] << 24;	//смещение отн.начала файла
+			Images[i].Offset |= sect[12] << 16;
+			Images[i].Offset |= sect[11] << 8;
+			Images[i].Offset |= sect[10];
+			Images[i].Offset += 1024;
+			Images[i].Size |= sect[5] << 24;		//размер файла
+			Images[i].Size |= sect[4] << 16;
+			Images[i].Size |= sect[3] << 8;
+			Images[i].Size |= sect[2];
 			if(Images[i].Width != menus[5].value)
 			{
 				Images[i].Width = 0;
@@ -487,10 +505,6 @@ int main(void)
 					}
 					if(OLD_EncoderMenu < EncoderMenu){
 						PrintPicture(shift+EncoderCount);
-					}
-					else{
-						int x = 0;
-						//выход
 					}
 				}
 				else
