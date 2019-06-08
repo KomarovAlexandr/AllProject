@@ -78,7 +78,7 @@ DSTATUS disk_status (
 {
   DSTATUS stat;
   
-  stat = disk.drv[pdrv]->disk_status(disk.lun[pdrv]);
+  stat = disk.drv[pdrv] -> disk_status(disk.lun[pdrv]);
   return stat;
 }
 

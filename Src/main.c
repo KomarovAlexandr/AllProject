@@ -93,7 +93,7 @@ struct menu menus[] = {                        // Задаем пункты ме
   {3, 0, 0, 3, false, "Restart",  0,   0,  0},
   {4, 1, 4, 1, false, "Files",    0,   0,  0},
   {5, 1, 0, 3, true,  "NumLED",   72, 0,  144},
-  {6, 1, 0, 3, true,  "Delay",    500,   0,  1000},
+  {6, 1, 0, 3, true,  "Delay",    200,   0,  1000},
   {7, 1, 0, 3, true,  "Cycle",    0,   0,  1}
 };
 struct Image                           
@@ -177,16 +177,19 @@ void PrintPicture(int NumPic){
 	//strcat(name, ".bmp");
 	f_open(&Pic, "FRY.bmp", FA_READ);
 	//f_read(&Pic, sect, 64, &bytesread);
-	//f_lseek(&Pic, Images[NumPic].Offset);
-	while(k <= 10){
-		f_read(&Pic, sect, menus[5].value, &bytesread);
+	//if(f_lseek(&Pic, Images[NumPic].Offset) != FR_OK) Error_Handler();
+	//if(Pic.fptr != Images[NumPic].Offset) Error_Handler();
+	f_lseek(&Pic, Images[NumPic].Offset);
+	while(k <= menus[5].value*5){
+		if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
 		delay_ms(menus[6].value);
-		for(int i = 0; i < 30; i+=3){
-			ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , i);
+		for(int i = 0, j = 0; i < menus[5].value; i+=3, j++){
+			ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
 		}
 		//while(1){}
 		HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
-		k += 30;
+		k += 72;
+		if(f_lseek(&Pic, (Images[NumPic].Offset + k)) != FR_OK) Error_Handler();
 	}
 }
 //--------------------------------------------------
@@ -281,10 +284,10 @@ int main(void)
 //	for(int i = 0; i < 30; i++){
 //			ws2812_pixel_rgb_to_buf_dma(i , i+15 , 0 , i);
 //	}
-	for(uint8_t i = 0; i < LED_COUNT; i++){
-		ws2812_pixel_rgb_to_buf_dma(i, 0, 0, i);
-	}
-	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
+//	for(uint8_t i = 0; i < LED_COUNT; i++){
+//		ws2812_pixel_rgb_to_buf_dma(i, 0, 0, i);
+//	}
+//	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 	//readDir
 	int NumOfFiles = 0;
 	if(f_mount(&SDFatFs,(TCHAR const*)USERPath,0)!=FR_OK)

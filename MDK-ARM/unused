@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 5060422: Last Updated: Fri Jun 07 23:36:38 2019
+;#<FEEDBACK># ARM Linker, 5060422: Last Updated: Sat Jun 08 11:49:41 2019
 ;VERSION 0.2
 ;FILE ccsbcs.o
 __asm___8_ccsbcs_c_b3db7f04____REV16 <= USED 0
@@ -27,7 +27,6 @@ __asm___4_ff_c_3f41df3e____RRX <= USED 0
 f_chmod <= USED 0
 f_getfree <= USED 0
 f_gets <= USED 0
-f_lseek <= USED 0
 f_mkdir <= USED 0
 f_mkfs <= USED 0
 f_printf <= USED 0
@@ -260,7 +259,6 @@ HAL_TIM_Encoder_Start_IT <= USED 0
 HAL_TIM_Encoder_Stop <= USED 0
 HAL_TIM_Encoder_Stop_DMA <= USED 0
 HAL_TIM_Encoder_Stop_IT <= USED 0
-HAL_TIM_ErrorCallback <= USED 0
 HAL_TIM_GenerateEvent <= USED 0
 HAL_TIM_IC_ConfigChannel <= USED 0
 HAL_TIM_IC_DeInit <= USED 0
@@ -307,8 +305,6 @@ HAL_TIM_ReadCapturedValue <= USED 0
 HAL_TIM_SlaveConfigSynchronization <= USED 0
 HAL_TIM_SlaveConfigSynchronization_IT <= USED 0
 TIM_DMACaptureCplt <= USED 0
-TIM_DMADelayPulseCplt <= USED 0
-TIM_DMAError <= USED 0
 TIM_TI1_SetConfig <= USED 0
 __asm___19_stm32f1xx_hal_tim_c_a9d95b52____REV16 <= USED 0
 __asm___19_stm32f1xx_hal_tim_c_a9d95b52____REVSH <= USED 0

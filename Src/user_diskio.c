@@ -134,7 +134,7 @@ DRESULT USER_read (
 	}
 	SPI_Release();
 	return count ? RES_ERROR : RES_OK;
-  return RES_OK;
+ // return RES_OK;
   /* USER CODE END READ */
 }
 
@@ -190,7 +190,7 @@ DRESULT USER_ioctl (
 )
 {
   /* USER CODE BEGIN IOCTL */
-    DRESULT res = RES_ERROR;
+    DRESULT res /*= RES_ERROR*/;
 		if (pdrv) return RES_PARERR;
 		if (Stat & STA_NOINIT) return RES_NOTRDY;
 		res = RES_ERROR;
