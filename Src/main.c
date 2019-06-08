@@ -94,7 +94,7 @@ struct menu menus[] = {                        // Задаем пункты ме
   {3, 0, 0, 3, false, "Restart",  0,   0,  0},
   {4, 1, 4, 1, false, "Files",    0,   0,  0},
   {5, 1, 0, 3, true,  "NumLED",   72, 0,  144},
-  {6, 1, 0, 3, true,  "Delay",    30,   0,  1000},
+  {6, 1, 0, 3, true,  "Delay",    5,   0,  1000},
   {7, 1, 0, 3, true,  "Cycle",    0,   0,  1}
 };
 struct Image                           
@@ -178,7 +178,7 @@ void PrintPicture(int NumPic){
 	f_open(&Pic, name, FA_READ);
 	k = Images[NumPic].Offset+19*3;
 	if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
-	while(k <= Images[NumPic].Width*Images[NumPic].Height){
+	while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
 		if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
 		delay_ms(menus[6].value);
 		
@@ -203,37 +203,6 @@ void reset (){
 	SCB->AIRCR = 0x05FA0004;
 }
 //--------------------------------------------------
-/*FRESULT ReadLongFile(void)
-{
-  uint16_t i=0, i1=0;
-  uint32_t ind=0;
-  uint32_t f_size = MyFile.fsize;
-  //sprintf(str1,"fsize: %lurn",(unsigned long)f_size);
-  //HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-  ind=0;
-  do
-  {
-    if(f_size<512)
-    {
-      i1=f_size;
-    }
-    else
-    {
-      i1=512;
-    }
-    f_size-=i1;
-    f_lseek(&MyFile,ind);
-    f_read(&MyFile,sect,i1,(UINT *)&bytesread);
-    for(i=0;i<bytesread;i++)
-    {
-      //HAL_UART_Transmit(&huart1,sect+i,1,0x1000);
-    }
-    ind+=i1;
-  }
-  while(f_size>0);
-  //HAL_UART_Transmit(&huart1,(uint8_t*)"rn",2,0x1000);
-  return FR_OK;
-}*/
 /* USER CODE END 0 */
 
 /**
