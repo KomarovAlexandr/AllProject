@@ -61,12 +61,11 @@ void EXTI1_IRQHandler(void)
 	while( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == GPIO_PIN_RESET ){
 		delay_ms(10);
 		timeButtonDown++;
-		if(timeButtonDown >= 25){
-			EncoderMenu--;
-			break;
-		}
 	}
-	if(timeButtonDown < 25){
+	if(timeButtonDown >= 15){
+			EncoderMenu--;
+		}
+	else{
 		EncoderMenu++;
 	}
 	timeButtonDown = 0; 

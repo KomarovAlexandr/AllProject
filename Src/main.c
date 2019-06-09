@@ -179,24 +179,29 @@ void PrintPicture(int NumPic){
 	k = Images[NumPic].Offset+19*3;
 	if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 	while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
+		//ws2812_init();
 		if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
 		delay_ms(menus[6].value);
-		
+		while(DMA_is_Ready != 1);
 		for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
 			ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
 		}
-		while(DMA_is_Ready != 1);
+		//while(DMA_is_Ready != 1);
 		DMA_is_Ready = 0;
 		HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 		k += menus[5].value*3;
 		if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 	}
+	/*while(DMA_is_Ready != 1);
 	for(int i = 0; i < menus[5].value + 10; i++){
 			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
 		}
-	while(DMA_is_Ready != 1);
-	DMA_is_Ready = 0;
-	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
+	//while(DMA_is_Ready != 1);
+	DMA_is_Ready = 0;*/
+	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,DELAY_LEN);
+	for(int i = 0; i < menus[5].value + 10; i++){
+			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
+		}
 }
 //--------------------------------------------------
 void reset (){
@@ -248,6 +253,7 @@ int main(void)
 	Delay_Init();
 	Encoder_Init();
 	ws2812_init();
+	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 	delay_ms(1000);
@@ -256,13 +262,6 @@ int main(void)
 	LCD_Init();
 	HAL_TIM_Base_Start_IT(&htim2);
 	disk_initialize(SDFatFs.drv);
-//	for(int i = 0; i < 30; i++){
-//			ws2812_pixel_rgb_to_buf_dma(i , i+15 , 0 , i);
-//	}
-//	for(uint8_t i = 0; i < LED_COUNT; i++){
-//		ws2812_pixel_rgb_to_buf_dma(i, 0, 0, i);
-//	}
-//	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 	//readDir
 	int NumOfFiles = 0;
 	if(f_mount(&SDFatFs,(TCHAR const*)USERPath,0)!=FR_OK)
@@ -298,27 +297,6 @@ int main(void)
 		}
 		else Error_Handler();
 	}
-	//write
-	/*if(f_mount(&SDFatFs,(TCHAR const*)USERPath,0)!=FR_OK)
-	{
-		Error_Handler();
-	}
-	else
-	{
-		if(f_open(&MyFile,"mywrite.txt",FA_CREATE_ALWAYS|FA_WRITE)!=FR_OK)
-		{
-			Error_Handler();
-		}
-		else
-		{
-			res=f_write(&MyFile,wtext,sizeof(wtext),(void*)&byteswritten);
-			if((byteswritten==0)||(res!=FR_OK))
-			{
-				Error_Handler();
-			}
-			f_close(&MyFile);
-		}
-	}*/
 	//read
 	for(int i = 0; i < NumOfFiles; i++)
 	{
@@ -474,6 +452,7 @@ int main(void)
 					}
 					if(OLD_EncoderMenu < EncoderMenu){
 						PrintPicture(shift+EncoderCount);
+						
 					}
 				}
 				else
@@ -484,10 +463,12 @@ int main(void)
 			}
 			restriction = menus[GroupNow].group - 1;
 			OLD_EncoderMenu = EncoderMenu;
+			OLD_MarkerRow = 0;
+			OLD_MarkerCol = 0;
 		}
   /* USER CODE END 3 */
-}
 	}
+}
 
 /**
   * @brief System Clock Configuration
