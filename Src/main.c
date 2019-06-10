@@ -94,7 +94,7 @@ struct menu menus[] = {                        // Задаем пункты ме
   {3, 0, 0, 3, false, "Restart",  0,   0,  0},
   {4, 1, 4, 1, false, "Files",    0,   0,  0},
   {5, 1, 0, 3, true,  "NumLED",   72, 0,  144},
-  {6, 1, 0, 3, true,  "Delay",    5,   0,  1000},
+  {6, 1, 0, 3, true,  "Delay",    3,   0,  1000},
   {7, 1, 0, 3, true,  "Cycle",    0,   0,  1}
 };
 struct Image                           
@@ -171,6 +171,7 @@ void printfiles(int NumOfFiles, int shift, int restriction){
 void PrintPicture(int NumPic){
 	FIL Pic;
 	int k = 0;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 	int OLD_EncoderMenu = EncoderMenu;
 	int x = strlen(Images[NumPic].name) + 4 + 2;
 	char *name = (char*) malloc(x * sizeof(char));
@@ -212,9 +213,10 @@ void PrintPicture(int NumPic){
 	}
 	
 	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,DELAY_LEN);
-	for(int i = 0; i < menus[5].value + 10; i++){
+	for(int i = 0; i < menus[5].value; i++){
 			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
 		}
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 	if( f_close(&Pic) != FR_OK) {
 				Error_Handler();
 			}
