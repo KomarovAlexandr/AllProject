@@ -171,6 +171,7 @@ void printfiles(int NumOfFiles, int shift, int restriction){
 void PrintPicture(int NumPic){
 	FIL Pic;
 	int k = 0;
+	int OLD_EncoderMenu = EncoderMenu;
 	int x = strlen(Images[NumPic].name) + 4 + 2;
 	char *name = (char*) malloc(x * sizeof(char));
 	strcpy( (char*)name, (char*)Images[NumPic].name);
@@ -178,30 +179,45 @@ void PrintPicture(int NumPic){
 	f_open(&Pic, name, FA_READ);
 	k = Images[NumPic].Offset+19*3;
 	if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
-	while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
-		//ws2812_init();
-		if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
-		delay_ms(menus[6].value);
-		while(DMA_is_Ready != 1);
-		for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
-			ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
+	if (menus[7].value == 0){
+		while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
+			if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
+			delay_ms(menus[6].value);
+			while(DMA_is_Ready != 1);
+			for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
+				ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
+			}
+			DMA_is_Ready = 0;
+			HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
+			k += menus[5].value*3;
+			if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 		}
-		//while(DMA_is_Ready != 1);
-		DMA_is_Ready = 0;
-		HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
-		k += menus[5].value*3;
-		if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 	}
-	/*while(DMA_is_Ready != 1);
-	for(int i = 0; i < menus[5].value + 10; i++){
-			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
+	else{
+		while(OLD_EncoderMenu == EncoderMenu){
+			while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
+				if(f_read(&Pic, sect, (menus[5].value * 3),(UINT *) &bytesread) != FR_OK) Error_Handler();
+				delay_ms(menus[6].value);
+				while(DMA_is_Ready != 1);
+				for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
+					ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
+				}
+				DMA_is_Ready = 0;
+				HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
+				k += menus[5].value*3;
+				if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
+			}
+			k = Images[NumPic].Offset+19*3;
 		}
-	//while(DMA_is_Ready != 1);
-	DMA_is_Ready = 0;*/
+	}
+	
 	HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,DELAY_LEN);
 	for(int i = 0; i < menus[5].value + 10; i++){
 			ws2812_pixel_rgb_to_buf_dma(0 , 0, 0, i);
 		}
+	if( f_close(&Pic) != FR_OK) {
+				Error_Handler();
+			}
 }
 //--------------------------------------------------
 void reset (){
