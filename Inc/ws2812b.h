@@ -8,7 +8,8 @@
 //--------------------------------------------------
 #define WS2812B_TIMER_AAR       0x0059
 #define DELAY_LEN 48
-#define LED_COUNT 72
+#define LED_COUNT 144
+
 #define ARRAY_LEN  DELAY_LEN+LED_COUNT * 24
 #define HIGH ((WS2812B_TIMER_AAR / 3) * 2)
 #define LOW (WS2812B_TIMER_AAR / 3)

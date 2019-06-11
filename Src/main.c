@@ -93,7 +93,7 @@ struct menu menus[] = {                        // Задаем пункты ме
   {2, 0, 5, 3, false, "Setting",  0,   0,  0},
   {3, 0, 0, 3, false, "Restart",  0,   0,  0},
   {4, 1, 4, 1, false, "Files",    0,   0,  0},
-  {5, 1, 0, 3, true,  "NumLED",   72, 0,  144},
+  {5, 1, 0, 3, true,  "NumLED",   144, 0,  144},
   {6, 1, 0, 3, true,  "Delay",    3,   0,  1000},
   {7, 1, 0, 3, true,  "Cycle",    0,   0,  1}
 };
@@ -171,6 +171,7 @@ void printfiles(int NumOfFiles, int shift, int restriction){
 void PrintPicture(int NumPic){
 	FIL Pic;
 	int k = 0;
+	int t = /*19*/(72+18)*3 + 2;
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 	int OLD_EncoderMenu = EncoderMenu;
 	int x = strlen(Images[NumPic].name) + 4 + 2;
@@ -178,7 +179,7 @@ void PrintPicture(int NumPic){
 	strcpy( (char*)name, (char*)Images[NumPic].name);
 	strcat(name, ".bmp");
 	f_open(&Pic, name, FA_READ);
-	k = Images[NumPic].Offset+19*3;
+	k = Images[NumPic].Offset + t;
 	if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 	if (menus[7].value == 0){
 		while(k <= (Images[NumPic].Width * Images[NumPic].Height * 3)){
@@ -186,7 +187,7 @@ void PrintPicture(int NumPic){
 			delay_ms(menus[6].value);
 			while(DMA_is_Ready != 1);
 			for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
-				ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
+				ws2812_pixel_rgb_to_buf_dma(sect[i+2], sect[i+1], sect[i], j);
 			}
 			DMA_is_Ready = 0;
 			HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
@@ -201,14 +202,14 @@ void PrintPicture(int NumPic){
 				delay_ms(menus[6].value);
 				while(DMA_is_Ready != 1);
 				for(int i = 0, j = 0; i < (menus[5].value * 3); i+=3, j++){
-					ws2812_pixel_rgb_to_buf_dma(sect[i] , sect[i+1] , sect[i+2] , j);
+					ws2812_pixel_rgb_to_buf_dma(sect[i+2], sect[i+1], sect[i], j);
 				}
 				DMA_is_Ready = 0;
 				HAL_TIM_PWM_Start_DMA(&htim3,TIM_CHANNEL_4,(uint32_t*)&BUF_DMA,ARRAY_LEN);
 				k += menus[5].value*3;
 				if(f_lseek(&Pic, k) != FR_OK) Error_Handler();
 			}
-			k = Images[NumPic].Offset+19*3;
+			k = Images[NumPic].Offset + t;
 		}
 	}
 	
@@ -293,7 +294,7 @@ int main(void)
 		result = f_opendir(&dir, "/");
 		if (result == FR_OK)
 		{
-			while(1)
+			while(NumOfFiles < 10)
 			{
 				result = f_readdir(&dir, &fileInfo);
 				if ((result==FR_OK && fileInfo.fname[0]) && NumOfFiles <= 9)
